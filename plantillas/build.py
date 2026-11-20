@@ -54,11 +54,21 @@ def strip_block(xml, tag, keep):
     return pat.sub(lambda m: m.group(1) if keep else "", xml)
 
 CREEMOS_DEF = [
- ("La Biblia", "es la Palabra de Dios, nuestra única regla de fe y conducta."),
- ("Dios", "un solo Dios verdadero en tres personas: Padre, Hijo y Espíritu Santo."),
- ("Salvación", "es por gracia, mediante la fe en Jesucristo, quien murió y resucitó por nosotros."),
- ("La iglesia", "la comunidad de los creyentes que se reúne para adorar, aprender y servir."),
+ ("La Biblia", "es la Palabra de Dios inspirada, nuestra única regla infalible de fe y conducta."),
+ ("Dios", "un solo Dios verdadero, eterno, en tres personas: Padre, Hijo y Espíritu Santo."),
+ ("Jesucristo", "es verdadero Dios y verdadero hombre; murió por nuestros pecados, resucitó y volverá en persona con poder y gloria."),
+ ("Salvación", "es por gracia, solo mediante la fe en Jesucristo, y no por nuestras obras."),
+ ("Nuevo nacimiento", "es la obra del Espíritu Santo que da vida nueva al pecador."),
+ ("El Espíritu Santo", "habita en el creyente, lo transforma y lo capacita para vivir y servir."),
+ ("Resurrección", "creemos en la resurrección de los salvos para vida eterna y de los perdidos para juicio."),
+ ("La iglesia", "un solo cuerpo, formado por todos los verdaderos creyentes en Cristo."),
+ ("El matrimonio", "es la unión de un solo hombre y una sola mujer, conforme a lo que Dios creó."),
 ]
+
+CONFESIONES = {
+ "1689": ("Confesión Bautista de Fe de 1689", "Como iglesia nos adherimos a la Confesión Bautista de Fe de 1689 (Segunda Confesión de Londres), que resume lo que creemos y enseñamos conforme a las Escrituras."),
+ "westminster": ("Confesión de Westminster", "Como iglesia nos adherimos a la Confesión de Fe de Westminster (1646), que resume lo que creemos y enseñamos conforme a las Escrituras."),
+}
 
 def build(c, plantilla=None):
     plantilla = plantilla or c.get("plantilla", "tradicion")
@@ -91,9 +101,13 @@ def build(c, plantilla=None):
         top = "<div class='two'><img alt='%s' class='photo' src='%s'/><div><h2>Nuestra iglesia</h2>%s</div></div>" % (e(nombre), e(foto), paras(quienes))
     else:
         top = "<div class='one'><h2>Nuestra iglesia</h2>%s</div>" % paras(quienes)
-    creemos = c.get("creemos") or CREEMOS_DEF
-    li = "".join("<li><b>%s:</b> %s</li>" % (e(a), e(b)) for a, b in [(x["titulo"], x["texto"]) if isinstance(x, dict) else x for x in creemos])
-    creemos_html = "<div class='card' style='margin-top:34px'><h3>Lo que creemos</h3><ul class='list'>%s</ul></div>" % li
+    conf = CONFESIONES.get((c.get("confesion") or "basica").lower())
+    if conf and not c.get("creemos"):
+        creemos_html = "<div class='card' style='margin-top:34px'><h3>Lo que creemos</h3><p>%s</p></div>" % e(conf[1])
+    else:
+        creemos = c.get("creemos") or CREEMOS_DEF
+        li = "".join("<li><b>%s:</b> %s</li>" % (e(a), e(b)) for a, b in [(x["titulo"], x["texto"]) if isinstance(x, dict) else x for x in creemos])
+        creemos_html = "<div class='card' style='margin-top:34px'><h3>Lo que creemos</h3><ul class='list'>%s</ul></div>" % li
     pastores = c.get("pastores")
     pastores_html = "<div class='card' style='margin-top:20px'><h3>Nuestros pastores</h3>%s</div>" % paras(pastores) if pastores else ""
 
